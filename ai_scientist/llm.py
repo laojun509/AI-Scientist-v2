@@ -262,7 +262,26 @@ def make_llm_call(client, model, temperature, system_message, prompt):
             n=1,
             seed=0,
         )
-    
+    elif model.startswith("deepseek"):
+        # Support for all DeepSeek models
+        model_mapping = {
+            "deepseek-coder-v2-0724": "deepseek-coder",
+            "deepseek-chat": "deepseek-chat",
+            "deepseek-reasoner": "deepseek-reasoner",
+            "deepseek-coder": "deepseek-coder",
+        }
+        client_model = model_mapping.get(model, model)
+        return client.chat.completions.create(
+            model=client_model,
+            messages=[
+                {"role": "system", "content": system_message},
+                *prompt,
+            ],
+            temperature=temperature,
+            max_tokens=MAX_NUM_TOKENS,
+            n=1,
+            stop=None,
+        )
     else:
         raise ValueError(f"Model {model} not supported.")
 
@@ -358,10 +377,19 @@ def get_response_from_llm(
         )
         content = response.choices[0].message.content
         new_msg_history = new_msg_history + [{"role": "assistant", "content": content}]
-    elif model == "deepseek-coder-v2-0724":
+    elif model.startswith("deepseek"):
+        # Support for all DeepSeek models
         new_msg_history = msg_history + [{"role": "user", "content": msg}]
+        # Map to DeepSeek API model names
+        model_mapping = {
+            "deepseek-coder-v2-0724": "deepseek-coder",
+            "deepseek-chat": "deepseek-chat",
+            "deepseek-reasoner": "deepseek-reasoner",
+            "deepseek-coder": "deepseek-coder",
+        }
+        client_model = model_mapping.get(model, model)
         response = client.chat.completions.create(
-            model="deepseek-coder",
+            model=client_model,
             messages=[
                 {"role": "system", "content": system_message},
                 *new_msg_history,
