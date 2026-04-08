@@ -32,6 +32,9 @@ AVAILABLE_LLMS = [
     "o3-mini-2025-01-31",
     # DeepSeek Models
     "deepseek-coder-v2-0724",
+    "deepseek-chat",
+    "deepseek-reasoner",
+    "deepseek-coder",
     "deepcoder-14b",
     # Llama 3 models
     "llama3.1-405b",
@@ -133,10 +136,19 @@ def get_batch_responses_from_llm(
         new_msg_history = [
             new_msg_history + [{"role": "assistant", "content": c}] for c in content
         ]
-    elif model == "deepseek-coder-v2-0724":
+    elif model.startswith("deepseek"):
+        # Support for all DeepSeek models
         new_msg_history = msg_history + [{"role": "user", "content": msg}]
+        # Map to DeepSeek API model names
+        model_mapping = {
+            "deepseek-coder-v2-0724": "deepseek-coder",
+            "deepseek-chat": "deepseek-chat",
+            "deepseek-reasoner": "deepseek-reasoner",
+            "deepseek-coder": "deepseek-coder",
+        }
+        client_model = model_mapping.get(model, model)
         response = client.chat.completions.create(
-            model="deepseek-coder",
+            model=client_model,
             messages=[
                 {"role": "system", "content": system_message},
                 *new_msg_history,
@@ -501,14 +513,23 @@ def create_client(model) -> tuple[Any, str]:
     elif "o1" in model or "o3" in model:
         print(f"Using OpenAI API with model {model}.")
         return openai.OpenAI(), model
-    elif model == "deepseek-coder-v2-0724":
-        print(f"Using OpenAI API with {model}.")
+    elif model.startswith("deepseek"):
+        # Support for DeepSeek models: deepseek-chat, deepseek-reasoner, deepseek-coder, etc.
+        print(f"Using DeepSeek API with {model}.")
+        # Map model names to DeepSeek API model names
+        model_mapping = {
+            "deepseek-coder-v2-0724": "deepseek-coder",
+            "deepseek-chat": "deepseek-chat",
+            "deepseek-reasoner": "deepseek-reasoner",
+            "deepseek-coder": "deepseek-coder",
+        }
+        client_model = model_mapping.get(model, model)
         return (
             openai.OpenAI(
                 api_key=os.environ["DEEPSEEK_API_KEY"],
                 base_url="https://api.deepseek.com",
             ),
-            model,
+            client_model,
         )
     elif model == "deepcoder-14b":
         print(f"Using HuggingFace API with {model}.")

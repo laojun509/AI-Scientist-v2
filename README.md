@@ -78,6 +78,26 @@ pip install anthropic[bedrock]
 ```
 Next, configure valid [AWS Credentials](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-envvars.html) and the target [AWS Region](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-regions.html) by setting the following environment variables: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION_NAME`.
 
+#### DeepSeek Models
+
+To use DeepSeek models, set the `DEEPSEEK_API_KEY` environment variable:
+```bash
+export DEEPSEEK_API_KEY="YOUR_DEEPSEEK_KEY_HERE"
+```
+Supported DeepSeek models:
+- `deepseek-chat` - General purpose chat model
+- `deepseek-reasoner` - Reasoning-focused model
+- `deepseek-coder` - Code generation model
+- `deepseek-coder-v2-0724` - Older coder model (maps to `deepseek-coder`)
+
+Example usage:
+```bash
+python ai_scientist/perform_ideation_temp_free.py \
+  --workshop-file "ai_scientist/ideas/my_topic.md" \
+  --model deepseek-chat \
+  --max-num-generations 20
+```
+
 #### Semantic Scholar API (Literature Search)
 
 Our code can optionally use a Semantic Scholar API Key (`S2_API_KEY`) for higher throughput during literature search [if you have one](https://www.semanticscholar.org/product/api). This is used during both the ideation and paper writing stages. The system should work without it, though you might encounter rate limits or reduced novelty checking during ideation. If you experience issues with Semantic Scholar, you can skip the citation phase during paper generation.
