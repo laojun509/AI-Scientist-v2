@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import os.path as osp
 import re
 import traceback
@@ -20,12 +21,16 @@ from ai_scientist.tools.base_tool import BaseTool
 # Create tool instances
 semantic_scholar_tool = SemanticScholarSearchTool()
 
+# Check if we should skip Semantic Scholar (for rate limiting issues)
+SKIP_S2 = os.environ.get("SKIP_SEMANTIC_SCHOLAR", "0") == "1"
+
 # Define tools at the top of the file
-tools = [
-    semantic_scholar_tool,
-    {
-        "name": "FinalizeIdea",
-        "description": """Finalize your idea by providing the idea details.
+tools = []
+if not SKIP_S2:
+    tools.append(semantic_scholar_tool)
+tools.append({
+    "name": "FinalizeIdea",
+    "description": """Finalize your idea by providing the idea details.
 
 The IDEA JSON should include the following fields:
 - "Name": A short descriptor of the idea. Lowercase, no spaces, underscores allowed.
@@ -35,8 +40,7 @@ The IDEA JSON should include the following fields:
 - "Abstract": An abstract that summarizes the proposal in conference format (approximately 250 words).
 - "Experiments": A list of experiments that would be conducted to validate the proposal. Ensure these are simple and feasible. Be specific in exactly how you would test the hypothesis, and detail precise algorithmic changes. Include the evaluation metrics you would use.
 - "Risk Factors and Limitations": A list of potential risks and limitations of the proposal.""",
-    },
-]
+})
 
 # Create a tools dictionary for easy lookup
 tools_dict = {tool.name: tool for tool in tools if isinstance(tool, BaseTool)}
@@ -93,7 +97,9 @@ IDEA JSON:
 
 Ensure the JSON is properly formatted for automatic parsing.
 
-Note: You should perform at least one literature search before finalizing your idea to ensure it is well-informed by existing research."""
+Note: You should perform at least one literature search before finalizing your idea to ensure it is well-informed by existing research.""" if not SKIP_S2 else """
+
+Note: Focus on proposing novel and creative ideas based on your knowledge. Draw from your understanding of the field to create distinctive research directions."""
 
 # Define the initial idea generation prompt
 idea_generation_prompt = """{workshop_description}
