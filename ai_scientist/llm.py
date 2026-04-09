@@ -73,6 +73,65 @@ AVAILABLE_LLMS = [
     "ollama/deepseek-r1:32b",
     "ollama/deepseek-r1:70b",
     "ollama/deepseek-r1:671b",
+    # MiniMax Models
+    "minimax-text-01",
+    "abab6.5s-chat",
+    "abab6.5-chat",
+    "abab6-chat",
+    # Zhipu AI (GLM) Models
+    "glm-4",
+    "glm-4-plus",
+    "glm-4-flash",
+    "glm-4-air",
+    "glm-4-airx",
+    "glm-4-long",
+    "glm-4-9b-chat",
+    # Alibaba Cloud (Qwen) Models via API
+    "qwen-max",
+    "qwen-max-longcontext",
+    "qwen-plus",
+    "qwen-turbo",
+    "qwen-coder-plus",
+    # Moonshot AI (Kimi)
+    "moonshot-v1-8k",
+    "moonshot-v1-32k",
+    "moonshot-v1-128k",
+    "kimi-k2.5",
+    "kimi-k2",
+    "kimi-k1.5",
+    "kimi-k1.5-long",
+    "kimi-k1.5-short",
+    # ByteDance (Doubao)
+    "doubao-1.5-pro-32k",
+    "doubao-1.5-pro-256k",
+    "doubao-1.5-lite-32k",
+    "doubao-pro-4k",
+    "doubao-pro-32k",
+    "doubao-pro-128k",
+    "doubao-lite-4k",
+    "doubao-lite-32k",
+    "doubao-lite-128k",
+    "doubao-vision-pro-32k",
+    # Qwen (Alibaba) - Extended
+    "qwen-coder-plus",
+    "qwen2.5-coder-32b-instruct",
+    "qwen2.5-coder-14b-instruct",
+    "qwen2.5-72b-instruct",
+    "qwen2.5-32b-instruct",
+    "qwen2.5-14b-instruct",
+    "qwen2.5-7b-instruct",
+    "qwen-vl-plus",
+    "qwen-vl-max",
+    "qwen-audio-turbo",
+    # Baichuan AI
+    "baichuan4",
+    "baichuan3-turbo",
+    "baichuan3-turbo-128k",
+    # 01.AI (Yi)
+    "yi-large",
+    "yi-medium",
+    "yi-spark",
+    "yi-large-rag",
 ]
 
 
@@ -180,6 +239,126 @@ def get_batch_responses_from_llm(
             new_msg_history + [{"role": "assistant", "content": c}] for c in content
         ]
     elif 'gemini' in model:
+        new_msg_history = msg_history + [{"role": "user", "content": msg}]
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_message},
+                *new_msg_history,
+            ],
+            temperature=temperature,
+            max_tokens=MAX_NUM_TOKENS,
+            n=n_responses,
+            stop=None,
+        )
+        content = [r.message.content for r in response.choices]
+        new_msg_history = [
+            new_msg_history + [{"role": "assistant", "content": c}] for c in content
+        ]
+    # Chinese Domestic Models (OpenAI compatible APIs)
+    elif model.startswith("minimax") or model.startswith("abab"):
+        new_msg_history = msg_history + [{"role": "user", "content": msg}]
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_message},
+                *new_msg_history,
+            ],
+            temperature=temperature,
+            max_tokens=MAX_NUM_TOKENS,
+            n=n_responses,
+            stop=None,
+        )
+        content = [r.message.content for r in response.choices]
+        new_msg_history = [
+            new_msg_history + [{"role": "assistant", "content": c}] for c in content
+        ]
+    elif model.startswith("glm-"):
+        new_msg_history = msg_history + [{"role": "user", "content": msg}]
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_message},
+                *new_msg_history,
+            ],
+            temperature=temperature,
+            max_tokens=MAX_NUM_TOKENS,
+            n=n_responses,
+            stop=None,
+        )
+        content = [r.message.content for r in response.choices]
+        new_msg_history = [
+            new_msg_history + [{"role": "assistant", "content": c}] for c in content
+        ]
+    elif model.startswith("qwen-"):
+        new_msg_history = msg_history + [{"role": "user", "content": msg}]
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_message},
+                *new_msg_history,
+            ],
+            temperature=temperature,
+            max_tokens=MAX_NUM_TOKENS,
+            n=n_responses,
+            stop=None,
+        )
+        content = [r.message.content for r in response.choices]
+        new_msg_history = [
+            new_msg_history + [{"role": "assistant", "content": c}] for c in content
+        ]
+    elif model.startswith("moonshot-") or model.startswith("kimi-"):
+        new_msg_history = msg_history + [{"role": "user", "content": msg}]
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_message},
+                *new_msg_history,
+            ],
+            temperature=temperature,
+            max_tokens=MAX_NUM_TOKENS,
+            n=n_responses,
+            stop=None,
+        )
+        content = [r.message.content for r in response.choices]
+        new_msg_history = [
+            new_msg_history + [{"role": "assistant", "content": c}] for c in content
+        ]
+    elif model.startswith("doubao-"):
+        new_msg_history = msg_history + [{"role": "user", "content": msg}]
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_message},
+                *new_msg_history,
+            ],
+            temperature=temperature,
+            max_tokens=MAX_NUM_TOKENS,
+            n=n_responses,
+            stop=None,
+        )
+        content = [r.message.content for r in response.choices]
+        new_msg_history = [
+            new_msg_history + [{"role": "assistant", "content": c}] for c in content
+        ]
+    elif model.startswith("baichuan"):
+        new_msg_history = msg_history + [{"role": "user", "content": msg}]
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_message},
+                *new_msg_history,
+            ],
+            temperature=temperature,
+            max_tokens=MAX_NUM_TOKENS,
+            n=n_responses,
+            stop=None,
+        )
+        content = [r.message.content for r in response.choices]
+        new_msg_history = [
+            new_msg_history + [{"role": "assistant", "content": c}] for c in content
+        ]
+    elif model.startswith("yi-"):
         new_msg_history = msg_history + [{"role": "user", "content": msg}]
         response = client.chat.completions.create(
             model=model,
@@ -586,6 +765,76 @@ def create_client(model) -> tuple[Any, str]:
             openai.OpenAI(
                 api_key=os.environ["GEMINI_API_KEY"],
                 base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+            ),
+            model,
+        )
+    # MiniMax Models
+    elif model.startswith("minimax") or model.startswith("abab"):
+        print(f"Using MiniMax API with {model}.")
+        return (
+            openai.OpenAI(
+                api_key=os.environ["MINIMAX_API_KEY"],
+                base_url="https://api.minimax.chat/v1",
+            ),
+            model,
+        )
+    # Zhipu AI (GLM) Models
+    elif model.startswith("glm-"):
+        print(f"Using Zhipu AI (GLM) API with {model}.")
+        return (
+            openai.OpenAI(
+                api_key=os.environ["ZHIPU_API_KEY"],
+                base_url="https://open.bigmodel.cn/api/paas/v4",
+            ),
+            model,
+        )
+    # Alibaba Cloud (Qwen) Models
+    elif model.startswith("qwen-"):
+        print(f"Using Alibaba Cloud (Qwen) API with {model}.")
+        return (
+            openai.OpenAI(
+                api_key=os.environ["DASHSCOPE_API_KEY"],
+                base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+            ),
+            model,
+        )
+    # Moonshot AI (Kimi)
+    elif model.startswith("moonshot-") or model.startswith("kimi-"):
+        print(f"Using Moonshot AI (Kimi) API with {model}.")
+        return (
+            openai.OpenAI(
+                api_key=os.environ["MOONSHOT_API_KEY"],
+                base_url="https://api.moonshot.cn/v1",
+            ),
+            model,
+        )
+    # ByteDance (Doubao)
+    elif model.startswith("doubao-"):
+        print(f"Using ByteDance (Doubao) API with {model}.")
+        return (
+            openai.OpenAI(
+                api_key=os.environ["DOUBAO_API_KEY"],
+                base_url="https://ark.cn-beijing.volces.com/api/v3",
+            ),
+            model,
+        )
+    # Baichuan AI
+    elif model.startswith("baichuan"):
+        print(f"Using Baichuan AI API with {model}.")
+        return (
+            openai.OpenAI(
+                api_key=os.environ["BAICHUAN_API_KEY"],
+                base_url="https://api.baichuan-ai.com/v1",
+            ),
+            model,
+        )
+    # 01.AI (Yi)
+    elif model.startswith("yi-"):
+        print(f"Using 01.AI (Yi) API with {model}.")
+        return (
+            openai.OpenAI(
+                api_key=os.environ["YI_API_KEY"],
+                base_url="https://api.lingyiwanwu.com/v1",
             ),
             model,
         )
